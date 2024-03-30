@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Reddit Image Expander",
+  "version": "1.0",
+
+  "description": "Expand images on Reddit by hovering over the thumbnail.",
+
+  "permissions": ["webRequest", "<all_urls>"],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.reddit.com/*"],
+      "js": ["viewer.js"]
+    }
+  ]
+}
