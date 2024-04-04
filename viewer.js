@@ -5,6 +5,8 @@ let mediaImages = [];
 let mouseX = 0;
 let mouseY = 0;
 
+let controller = new AbortController();
+
 const img = document.createElement("img");
 img.style.position = "fixed";
 img.style.maxWidth = "50vw";
@@ -57,12 +59,26 @@ const positionImage = () => {
 const supportedSites = ["i.redd.it", "imgur.com"];
 
 const handleMouseEnter = async (e) => {
+  controller = new AbortController();
+
   const id = e.target.closest("shreddit-post").getAttribute("id");
   const url = `https://api.reddit.com/by_id/${id}`;
-  const res = await fetch(url);
-  const jsn = await res.json();
+
+  let res;
+  let jsn;
+  try {
+    res = await fetch(url, { signal: controller.signal });
+    jsn = await res.json();
+  } catch (e) {
+    if (e.name === "AbortError") {
+      return;
+    }
+    console.error(e);
+  }
+
   const data = jsn.data.children[0].data;
   if (data.media_metadata) {
+    // Post is a gallery
     mediaIndex = 0;
     mediaImages = [];
     const metaData = data.media_metadata;
@@ -81,6 +97,7 @@ const handleMouseEnter = async (e) => {
       indexBox.hidden = false;
     }
   } else {
+    // Post is a single image
     const imgUrl = data.url;
     let found = false;
     supportedSites.forEach((site) => {
@@ -97,6 +114,7 @@ const handleMouseEnter = async (e) => {
 };
 
 const handleMouseLeave = () => {
+  controller.abort();
   img.src = "";
   img.hidden = true;
   indexBox.hidden = true;
