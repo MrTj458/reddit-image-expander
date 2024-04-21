@@ -77,14 +77,15 @@ const handleMouseEnter = async (e) => {
   }
 
   const data = jsn.data.children[0].data;
-  if (data.media_metadata) {
+  if (data.gallery_data && data.media_metadata) {
     // Post is a gallery
     mediaIndex = 0;
     mediaImages = [];
     const metaData = data.media_metadata;
+    const galleryData = data.gallery_data.items;
 
-    Object.keys(metaData).forEach((imageID) => {
-      const meta = metaData[imageID];
+    galleryData.forEach((image) => {
+      const meta = metaData[image.media_id];
       const type = meta.m.split("/")[1];
       const url = `https://i.redd.it/${meta.id}.${type}`;
       mediaImages.push(url);
