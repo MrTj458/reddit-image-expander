@@ -40,7 +40,7 @@ const positionImage = () => {
   if (mouseY > window.innerHeight * 0.5) {
     indexBox.style.top = `${mouseY - 2 * offset}px`;
 
-    if (mouseY - img.height - offset <= 0) {
+    if (mouseY - img.height - (2 * offset) <= 0) {
       img.style.top = `${offset}px`;
     } else {
       img.style.top = `${mouseY - img.height - offset}px`;
@@ -48,7 +48,7 @@ const positionImage = () => {
   } else {
     indexBox.style.top = `${mouseY + 2 * offset}px`;
 
-    if (mouseY + img.height + offset >= window.innerHeight) {
+    if (mouseY + img.height + (2 * offset) >= window.innerHeight) {
       img.style.top = `${window.innerHeight - img.height - offset}px`;
     } else {
       img.style.top = `${mouseY + offset}px`;
