@@ -119,6 +119,7 @@ const handleMouseLeave = () => {
   img.src = "";
   img.hidden = true;
   indexBox.hidden = true;
+  mediaIndex = 0;
   mediaImages = [];
 };
 
