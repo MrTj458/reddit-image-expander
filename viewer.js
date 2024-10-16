@@ -145,18 +145,20 @@ const handleRightClick = (e) => {
 };
 
 const setupEvents = () => {
-  document.querySelectorAll("faceplate-img").forEach((p) => {
-    p.removeEventListener("mouseenter", handleMouseEnter);
-    p.addEventListener("mouseenter", handleMouseEnter);
+  document.querySelectorAll("shreddit-post").forEach((p) => {
+    const img = p.querySelector('img')
 
-    p.removeEventListener("mouseleave", handleMouseLeave);
-    p.addEventListener("mouseleave", handleMouseLeave);
+    img.removeEventListener("mouseenter", handleMouseEnter);
+    img.addEventListener("mouseenter", handleMouseEnter);
 
-    p.removeEventListener("click", handleLeftClick);
-    p.addEventListener("click", handleLeftClick);
+    img.removeEventListener("mouseleave", handleMouseLeave);
+    img.addEventListener("mouseleave", handleMouseLeave);
 
-    p.removeEventListener("contextmenu", handleRightClick);
-    p.addEventListener("contextmenu", handleRightClick);
+    img.removeEventListener("click", handleLeftClick);
+    img.addEventListener("click", handleLeftClick);
+
+    img.removeEventListener("contextmenu", handleRightClick);
+    img.addEventListener("contextmenu", handleRightClick);
   });
 };
 
