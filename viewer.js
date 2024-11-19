@@ -30,6 +30,11 @@ class ImageHandler {
     this.img = img;
   }
 
+  changeImg = (url, mouseX, mouseY) => {
+    this.img.src = url;
+    this.img.onload = () => this.position(mouseX, mouseY);
+  }
+
   hide = () => {
     document.body.removeChild(this.img);
   }
@@ -61,7 +66,7 @@ class ImageHandler {
 }
 
 class GalleryHandler {
-  img = null
+  imgHandler = new ImageHandler();
   indexBox = null;
 
   index = 0;
@@ -89,21 +94,6 @@ class GalleryHandler {
     });
     this.mediaImages = mediaImages;
 
-    const img = document.createElement("img");
-
-    img.style.position = "fixed";
-    img.style.maxWidth = "50vw";
-    img.style.maxHeight = "90vh";
-    img.style.border = "2px solid gray";
-    img.style.backgroundColor = "#000";
-    img.style.borderRadius = "3px";
-    img.style.zIndex = "1000000";
-
-    img.src = postData.url;
-    img.onload = () => this.position(mouseX, mouseY);
-    document.body.appendChild(img);
-    this.img = img;
-
     const indexBox = document.createElement("div");
     indexBox.style.position = "fixed";
     indexBox.style.backgroundColor = "gray";
@@ -116,11 +106,12 @@ class GalleryHandler {
     document.body.appendChild(indexBox);
     this.indexBox = indexBox;
 
-    img.src = this.mediaImages[this.index];
+    this.imgHandler.display({ url: this.mediaImages[this.index] }, mouseX, mouseY);
+    this.position(mouseX, mouseY);
   }
 
   hide = () => {
-    document.body.removeChild(this.img)
+    this.imgHandler.hide()
     document.body.removeChild(this.indexBox)
 
     this.mediaImages = [];
@@ -130,53 +121,31 @@ class GalleryHandler {
   leftClick = (mouseX, mouseY) => {
     if (this.index < this.mediaImages.length - 1) {
       this.index += 1;
-      this.img.src = this.mediaImages[this.index];
+      this.imgHandler.changeImg(this.mediaImages[this.index], mouseX, mouseY);
       this.indexBox.innerText = `${this.index + 1}/${this.mediaImages.length}`;
-
-      this.img.onload = () => this.position(mouseX, mouseY)
-
     }
   }
 
   rightClick = (mouseX, mouseY) => {
     if (this.index > 0) {
       this.index -= 1;
-      this.img.src = this.mediaImages[this.index];
+      this.imgHandler.changeImg(this.mediaImages[this.index], mouseX, mouseY);
       this.indexBox.innerText = `${this.index + 1}/${this.mediaImages.length}`;
-
-      this.img.onload = () => this.position(mouseX, mouseY)
     }
   }
 
   position = (mouseX, mouseY) => {
     let offset = 20;
-    let img = this.img;
     let indexBox = this.indexBox;
 
-    if (mouseX > window.innerWidth * 0.5) {
-      img.style.left = `${mouseX - img.width - offset}px`;
-    } else {
-      img.style.left = `${mouseX + offset}px`;
-    }
+    this.imgHandler.position(mouseX, mouseY);
 
     indexBox.style.left = `${mouseX - indexBox.clientWidth / 2}px`;
 
     if (mouseY > window.innerHeight * 0.5) {
       indexBox.style.top = `${mouseY - 2 * offset}px`;
-
-      if (mouseY - img.height - (2 * offset) <= 0) {
-        img.style.top = `${offset}px`;
-      } else {
-        img.style.top = `${mouseY - img.height - offset}px`;
-      }
     } else {
       indexBox.style.top = `${mouseY + 2 * offset}px`;
-
-      if (mouseY + img.height + (2 * offset) >= window.innerHeight) {
-        img.style.top = `${window.innerHeight - img.height - offset}px`;
-      } else {
-        img.style.top = `${mouseY + offset}px`;
-      }
     }
   }
 }
@@ -187,8 +156,8 @@ class RedHandler {
   height = 0;
   frame = null;
 
-  canHandle = (data) => {
-    if (data.url.includes('www.redgifs.com')) {
+  canHandle = (postData) => {
+    if (postData.url.includes('www.redgifs.com')) {
       return true;
     }
 
@@ -243,40 +212,43 @@ class RedHandler {
     }
 
     let offset = 20;
-    let frame = this.frame;
-    let width = this.width;
-    let height = this.height;
 
     if (mouseX > window.innerWidth * 0.5) {
-      frame.style.left = `${mouseX - width - offset}px`;
+      this.frame.style.left = `${mouseX - this.width - offset}px`;
     } else {
-      frame.style.left = `${mouseX + offset}px`;
+      this.frame.style.left = `${mouseX + offset}px`;
     }
 
     if (mouseY > window.innerHeight * 0.5) {
-      if (mouseY - height - (2 * offset) <= 0) {
-        frame.style.top = `${offset}px`;
+      if (mouseY - this.height - (2 * offset) <= 0) {
+        this.frame.style.top = `${offset}px`;
       } else {
-        frame.style.top = `${mouseY - height - offset}px`;
+        this.frame.style.top = `${mouseY - this.height - offset}px`;
       }
     } else {
-      if (mouseY + height + (2 * offset) >= window.innerHeight) {
-        frame.style.top = `${window.innerHeight - height - offset}px`;
+      if (mouseY + this.height + (2 * offset) >= window.innerHeight) {
+        this.frame.style.top = `${window.innerHeight - this.height - offset}px`;
       } else {
-        frame.style.top = `${mouseY + offset}px`;
+        this.frame.style.top = `${mouseY + offset}px`;
       }
     }
   }
 }
 
 class PopupManager {
-  handlers = [new ImageHandler, new GalleryHandler, new RedHandler]
+  handlers = []
   handler = null;
 
   mouseX = 0;
   mouseY = 0;
 
   abortController = null;
+
+  constructor(handlers) {
+    if (handlers) {
+      this.handlers = handlers;
+    }
+  }
 
   start = () => {
     this.setupMouseListeners();
@@ -375,5 +347,9 @@ class PopupManager {
   }
 }
 
-const manager = new PopupManager();
+const manager = new PopupManager([
+  new ImageHandler(),
+  new GalleryHandler(),
+  new RedHandler()
+]);
 manager.start();
