@@ -10,7 +10,7 @@ class ImageHandler {
       }
     }
     return false;
-  }
+  };
 
   display = (postData, mouseX, mouseY) => {
     const img = document.createElement("img");
@@ -28,16 +28,16 @@ class ImageHandler {
 
     document.body.appendChild(img);
     this.img = img;
-  }
+  };
 
   changeImg = (url, mouseX, mouseY) => {
     this.img.src = url;
     this.img.onload = () => this.position(mouseX, mouseY);
-  }
+  };
 
   hide = () => {
     document.body.removeChild(this.img);
-  }
+  };
 
   position = (mouseX, mouseY) => {
     let offset = 20;
@@ -50,19 +50,19 @@ class ImageHandler {
     }
 
     if (mouseY > window.innerHeight * 0.5) {
-      if (mouseY - img.height - (2 * offset) <= 0) {
+      if (mouseY - img.height - 2 * offset <= 0) {
         img.style.top = `${offset}px`;
       } else {
         img.style.top = `${mouseY - img.height - offset}px`;
       }
     } else {
-      if (mouseY + img.height + (2 * offset) >= window.innerHeight) {
+      if (mouseY + img.height + 2 * offset >= window.innerHeight) {
         img.style.top = `${window.innerHeight - img.height - offset}px`;
       } else {
         img.style.top = `${mouseY + offset}px`;
       }
     }
-  }
+  };
 }
 
 class GalleryHandler {
@@ -78,7 +78,7 @@ class GalleryHandler {
     }
 
     return false;
-  }
+  };
 
   display = (postData, mouseX, mouseY) => {
     const metaData = postData.media_metadata;
@@ -106,17 +106,21 @@ class GalleryHandler {
     document.body.appendChild(indexBox);
     this.indexBox = indexBox;
 
-    this.imgHandler.display({ url: this.mediaImages[this.index] }, mouseX, mouseY);
+    this.imgHandler.display(
+      { url: this.mediaImages[this.index] },
+      mouseX,
+      mouseY
+    );
     this.position(mouseX, mouseY);
-  }
+  };
 
   hide = () => {
-    this.imgHandler.hide()
-    document.body.removeChild(this.indexBox)
+    this.imgHandler.hide();
+    document.body.removeChild(this.indexBox);
 
     this.mediaImages = [];
     this.index = 0;
-  }
+  };
 
   leftClick = (mouseX, mouseY) => {
     if (this.index < this.mediaImages.length - 1) {
@@ -124,7 +128,7 @@ class GalleryHandler {
       this.imgHandler.changeImg(this.mediaImages[this.index], mouseX, mouseY);
       this.indexBox.innerText = `${this.index + 1}/${this.mediaImages.length}`;
     }
-  }
+  };
 
   rightClick = (mouseX, mouseY) => {
     if (this.index > 0) {
@@ -132,7 +136,7 @@ class GalleryHandler {
       this.imgHandler.changeImg(this.mediaImages[this.index], mouseX, mouseY);
       this.indexBox.innerText = `${this.index + 1}/${this.mediaImages.length}`;
     }
-  }
+  };
 
   position = (mouseX, mouseY) => {
     let offset = 20;
@@ -147,7 +151,7 @@ class GalleryHandler {
     } else {
       indexBox.style.top = `${mouseY + 2 * offset}px`;
     }
-  }
+  };
 }
 
 class RedHandler {
@@ -157,12 +161,12 @@ class RedHandler {
   frame = null;
 
   canHandle = (postData) => {
-    if (postData.url.includes('redgifs')) {
+    if (postData.url.includes("redgifs")) {
       return true;
     }
 
     return false;
-  }
+  };
 
   display = (postData, mouseX, mouseY) => {
     if (this.frozen) {
@@ -176,25 +180,25 @@ class RedHandler {
 
     frame.style.position = "fixed";
     frame.style.width = `${this.width}px`;
-    frame.style.height = `${this.height}px`
+    frame.style.height = `${this.height}px`;
     frame.style.border = "2px solid gray";
     frame.style.backgroundColor = "#000";
     frame.style.borderRadius = "3px";
     frame.scrolling = "no";
     frame.style.zIndex = "1000000";
-    frame.src = postData.url.replace('watch', 'ifr');
+    frame.src = postData.url.replace("watch", "ifr");
     frame.onload = () => this.position(mouseX, mouseY);
     document.body.appendChild(frame);
     this.frame = frame;
-  }
+  };
 
   hide = () => {
     if (this.frozen) {
       return;
     }
 
-    document.body.removeChild(this.frame)
-  }
+    document.body.removeChild(this.frame);
+  };
 
   leftClick = () => {
     if (this.frozen) {
@@ -204,7 +208,7 @@ class RedHandler {
       this.frozen = true;
       this.frame.style.border = "2px solid red";
     }
-  }
+  };
 
   position = (mouseX, mouseY) => {
     if (this.frozen) {
@@ -220,23 +224,23 @@ class RedHandler {
     }
 
     if (mouseY > window.innerHeight * 0.5) {
-      if (mouseY - this.height - (2 * offset) <= 0) {
+      if (mouseY - this.height - 2 * offset <= 0) {
         this.frame.style.top = `${offset}px`;
       } else {
         this.frame.style.top = `${mouseY - this.height - offset}px`;
       }
     } else {
-      if (mouseY + this.height + (2 * offset) >= window.innerHeight) {
+      if (mouseY + this.height + 2 * offset >= window.innerHeight) {
         this.frame.style.top = `${window.innerHeight - this.height - offset}px`;
       } else {
         this.frame.style.top = `${mouseY + offset}px`;
       }
     }
-  }
+  };
 }
 
 class PopupManager {
-  handlers = []
+  handlers = [];
   handler = null;
 
   mouseX = 0;
@@ -255,38 +259,38 @@ class PopupManager {
     this.setupMouseListeners();
     this.setupImageListeners();
     setInterval(this.setupImageListeners, 5000);
-  }
+  };
 
   setupMouseListeners = () => {
-    document.addEventListener('mousemove', e => {
+    document.addEventListener("mousemove", (e) => {
       this.mouseX = e.clientX;
       this.mouseY = e.clientY;
 
       if (this.handler) {
         this.handler.position(this.mouseX, this.mouseY);
       }
-    })
-  }
+    });
+  };
 
   setupImageListeners = () => {
     document.querySelectorAll("shreddit-post").forEach((p) => {
-      const img = p.querySelector('img')
+      const img = p.querySelector("img");
 
       try {
         img.removeEventListener("mouseenter", this.handleMouseEnter);
         img.removeEventListener("mouseleave", this.handleMouseLeave);
         img.removeEventListener("click", this.handleLeftClick);
         img.removeEventListener("contextmenu", this.handleRightClick);
-      } catch (e) { }
+      } catch (e) {}
 
       try {
         img.addEventListener("mouseenter", this.handleMouseEnter);
         img.addEventListener("mouseleave", this.handleMouseLeave);
         img.addEventListener("click", this.handleLeftClick);
         img.addEventListener("contextmenu", this.handleRightClick);
-      } catch (e) { }
+      } catch (e) {}
     });
-  }
+  };
 
   handleMouseEnter = async (e) => {
     const postId = e.target.closest("shreddit-post").getAttribute("id");
@@ -314,12 +318,12 @@ class PopupManager {
       if (handler.canHandle(postData)) {
         this.handler = handler;
         this.handler.display(postData, this.mouseX, this.mouseY);
-        return
+        return;
       }
     }
 
-    console.error(`no handlers support ${postData.url}`)
-  }
+    console.error(`no handlers support ${postData.url}`);
+  };
 
   handleMouseLeave = () => {
     if (this.abortController) {
@@ -332,7 +336,7 @@ class PopupManager {
 
     this.handler.hide();
     this.handler = null;
-  }
+  };
 
   handleLeftClick = (e) => {
     if (this.handler && this.handler.leftClick) {
@@ -340,7 +344,7 @@ class PopupManager {
       e.preventDefault();
       this.handler.leftClick(this.mouseX, this.mouseY);
     }
-  }
+  };
 
   handleRightClick = (e) => {
     if (this.handler && this.handler.rightClick) {
@@ -348,7 +352,7 @@ class PopupManager {
       e.preventDefault();
       this.handler.rightClick(this.mouseX, this.mouseY);
     }
-  }
+  };
 }
 
 const manager = new PopupManager([
