@@ -157,7 +157,7 @@ class RedHandler {
   frame = null;
 
   canHandle = (postData) => {
-    if (postData.url.includes('www.redgifs.com')) {
+    if (postData.url.includes('redgifs')) {
       return true;
     }
 
@@ -243,6 +243,7 @@ class PopupManager {
   mouseY = 0;
 
   abortController = null;
+  cache = {};
 
   constructor(handlers) {
     if (handlers) {
@@ -288,22 +289,25 @@ class PopupManager {
   }
 
   handleMouseEnter = async (e) => {
-    this.abortController = new AbortController();
+    const postId = e.target.closest("shreddit-post").getAttribute("id");
 
-    const id = e.target.closest("shreddit-post").getAttribute("id");
-    const url = `https://api.reddit.com/by_id/${id}`;
+    let postData = this.cache[postId];
+    if (!postData) {
+      this.abortController = new AbortController();
 
-    let postData = null;
-    try {
-      const res = await fetch(url, { signal: this.abortController.signal });
-      const jsn = await res.json();
-      postData = jsn.data.children[0].data
-    } catch (e) {
-      if (e.name === "AbortError") {
+      try {
+        const url = `https://api.reddit.com/by_id/${postId}`;
+        const res = await fetch(url, { signal: this.abortController.signal });
+        const jsn = await res.json();
+        postData = jsn.data.children[0].data;
+        this.cache[postId] = postData;
+      } catch (e) {
+        if (e.name === "AbortError") {
+          return;
+        }
+        console.error(e);
         return;
       }
-      console.error(e);
-      return;
     }
 
     for (let handler of this.handlers) {
@@ -350,6 +354,6 @@ class PopupManager {
 const manager = new PopupManager([
   new ImageHandler(),
   new GalleryHandler(),
-  new RedHandler()
+  new RedHandler(),
 ]);
 manager.start();
