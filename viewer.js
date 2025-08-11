@@ -1,5 +1,5 @@
 class ImageHandler {
-  supportedSites = ["i.redd.it", "imgur.com"];
+  supportedSites = ["i.redd.it", "imgur.com", "files.catbox.moe"];
 
   img = null;
 
