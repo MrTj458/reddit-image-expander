@@ -275,8 +275,17 @@ class PopupManager {
 
   start = () => {
     this.setupMouseListeners();
-    this.setupImageListeners();
-    setInterval(this.setupImageListeners, 5000);
+    this.setupImageListeners([
+      {
+        addedNodes: Array.from(
+          document.querySelector("shreddit-feed").children
+        ),
+      },
+    ]);
+    const observer = new MutationObserver(this.setupImageListeners);
+    observer.observe(document.querySelector("shreddit-feed"), {
+      childList: true,
+    });
   };
 
   setupMouseListeners = () => {
@@ -290,24 +299,21 @@ class PopupManager {
     });
   };
 
-  setupImageListeners = () => {
-    document.querySelectorAll("shreddit-post").forEach((p) => {
-      const img = p.querySelector("img");
+  setupImageListeners = (mutationList) => {
+    console.log("setup listeners");
+    for (const mutation of mutationList) {
+      mutation.addedNodes.forEach((node) => {
+        const post = node.querySelector("shreddit-post");
+        if (post) {
+          const img = post.querySelector("img");
 
-      try {
-        img.removeEventListener("mouseenter", this.handleMouseEnter);
-        img.removeEventListener("mouseleave", this.handleMouseLeave);
-        img.removeEventListener("click", this.handleLeftClick);
-        img.removeEventListener("contextmenu", this.handleRightClick);
-      } catch (e) {}
-
-      try {
-        img.addEventListener("mouseenter", this.handleMouseEnter);
-        img.addEventListener("mouseleave", this.handleMouseLeave);
-        img.addEventListener("click", this.handleLeftClick);
-        img.addEventListener("contextmenu", this.handleRightClick);
-      } catch (e) {}
-    });
+          img.addEventListener("mouseenter", this.handleMouseEnter);
+          img.addEventListener("mouseleave", this.handleMouseLeave);
+          img.addEventListener("click", this.handleLeftClick);
+          img.addEventListener("contextmenu", this.handleRightClick);
+        }
+      });
+    }
   };
 
   handleMouseEnter = async (e) => {
@@ -395,7 +401,6 @@ const manager = new PopupManager([
         }
 
         const embedURL = `https://www.youtube.com/embed/${videoID}?autoplay=1`;
-        console.log(embedURL);
         return embedURL;
       },
     },
