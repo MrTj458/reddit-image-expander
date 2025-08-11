@@ -1,7 +1,11 @@
 class ImageHandler {
-  supportedSites = ["i.redd.it", "imgur.com", "files.catbox.moe"];
+  supportedSites = [];
 
   img = null;
+
+  constructor(supportedSites) {
+    this.supportedSites = supportedSites;
+  }
 
   canHandle = (data) => {
     for (let site of this.supportedSites) {
@@ -154,17 +158,30 @@ class GalleryHandler {
   };
 }
 
-class RedHandler {
+class IFrameHandler {
   frozen = false;
   width = 0;
   height = 0;
   frame = null;
 
+  handlers = [];
+  handler = null;
+
+  constructor(handlers) {
+    this.handlers = handlers;
+  }
+
   canHandle = (postData) => {
-    if (postData.url.includes("redgifs")) {
-      return true;
+    for (let handler of this.handlers) {
+      for (let url of handler.urls) {
+        if (postData.url.includes(url)) {
+          this.handler = handler;
+          return true;
+        }
+      }
     }
 
+    this.handler = null;
     return false;
   };
 
@@ -185,8 +202,9 @@ class RedHandler {
     frame.style.backgroundColor = "#000";
     frame.style.borderRadius = "3px";
     frame.scrolling = "no";
+    frame.allow = "autoplay";
     frame.style.zIndex = "1000000";
-    frame.src = postData.url.replace("watch", "ifr");
+    frame.src = this.handler.getEmbedURL(postData.url);
     frame.onload = () => this.position(mouseX, mouseY);
     document.body.appendChild(frame);
     this.frame = frame;
@@ -356,8 +374,31 @@ class PopupManager {
 }
 
 const manager = new PopupManager([
-  new ImageHandler(),
+  new ImageHandler(["i.redd.it", "imgur.com", "files.catbox.moe"]),
   new GalleryHandler(),
-  new RedHandler(),
+  new IFrameHandler([
+    {
+      urls: ["redgifs"],
+      getEmbedURL: (url) => {
+        return url.replace("watch", "ifr");
+      },
+    },
+    {
+      urls: ["youtu"],
+      getEmbedURL: (url) => {
+        const parsedURL = new URL(url);
+
+        let videoID = parsedURL.searchParams.get("v");
+        if (videoID === null) {
+          // URL is probably the shortened youtu.be version
+          videoID = parsedURL.pathname.split("/")[1];
+        }
+
+        const embedURL = `https://www.youtube.com/embed/${videoID}?autoplay=1`;
+        console.log(embedURL);
+        return embedURL;
+      },
+    },
+  ]),
 ]);
 manager.start();
