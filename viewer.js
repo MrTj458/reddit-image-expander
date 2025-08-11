@@ -300,7 +300,6 @@ class PopupManager {
   };
 
   setupImageListeners = (mutationList) => {
-    console.log("setup listeners");
     for (const mutation of mutationList) {
       mutation.addedNodes.forEach((node) => {
         const post = node.querySelector("shreddit-post");
