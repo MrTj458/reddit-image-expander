@@ -1,0 +1,25 @@
+{
+  "name": "reddit-image-expander",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --noEmit && rm ./dist/* && esbuild --bundle src/index.ts --outdir=dist && cp ./assets/manifest.json ./dist/manifest.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrTj458/reddit-image-expander.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MrTj458/reddit-image-expander/issues"
+  },
+  "homepage": "https://github.com/MrTj458/reddit-image-expander#readme",
+  "devDependencies": {
+    "esbuild": "^0.25.8",
+    "typescript": "^5.9.2"
+  }
+}
