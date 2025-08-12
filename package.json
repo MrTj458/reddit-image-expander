@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --noEmit && rm ./dist/* && esbuild --bundle src/index.ts --outdir=dist && cp ./assets/manifest.json ./dist/manifest.json"
+    "build": "tsc --noEmit && esbuild --bundle src/index.ts --outdir=dist && cp ./assets/manifest.json ./dist/manifest.json"
   },
   "repository": {
     "type": "git",

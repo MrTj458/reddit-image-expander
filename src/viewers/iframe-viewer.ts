@@ -68,6 +68,7 @@ export default class IFrameViewer implements Viewer {
     }
 
     document.body.removeChild(this.frame);
+    this.frame.src = "";
   };
 
   leftClick = (mouseX: number, mouseY: number) => {

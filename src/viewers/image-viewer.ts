@@ -33,12 +33,12 @@ export default class ImageViewer implements Viewer {
     img.onload = () => this.position(mouseX, mouseY);
 
     document.body.appendChild(img);
-    // this.img = img;
   };
 
   hide = () => {
     if (this.img) {
       document.body.removeChild(this.img);
+      this.img.src = "";
     }
   };
 
