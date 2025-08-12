@@ -275,17 +275,8 @@ class PopupManager {
 
   start = () => {
     this.setupMouseListeners();
-    this.setupImageListeners([
-      {
-        addedNodes: Array.from(
-          document.querySelector("shreddit-feed").children
-        ),
-      },
-    ]);
-    const observer = new MutationObserver(this.setupImageListeners);
-    observer.observe(document.querySelector("shreddit-feed"), {
-      childList: true,
-    });
+    this.setupImageListeners();
+    setInterval(this.setupImageListeners, 5000);
   };
 
   setupMouseListeners = () => {
@@ -299,20 +290,24 @@ class PopupManager {
     });
   };
 
-  setupImageListeners = (mutationList) => {
-    for (const mutation of mutationList) {
-      mutation.addedNodes.forEach((node) => {
-        const post = node.querySelector("shreddit-post");
-        if (post) {
-          const img = post.querySelector("img");
+  setupImageListeners = () => {
+    document.querySelectorAll("shreddit-post").forEach((p) => {
+      const img = p.querySelector("img");
 
-          img.addEventListener("mouseenter", this.handleMouseEnter);
-          img.addEventListener("mouseleave", this.handleMouseLeave);
-          img.addEventListener("click", this.handleLeftClick);
-          img.addEventListener("contextmenu", this.handleRightClick);
-        }
-      });
-    }
+      try {
+        img.removeEventListener("mouseenter", this.handleMouseEnter);
+        img.removeEventListener("mouseleave", this.handleMouseLeave);
+        img.removeEventListener("click", this.handleLeftClick);
+        img.removeEventListener("contextmenu", this.handleRightClick);
+      } catch (e) {}
+
+      try {
+        img.addEventListener("mouseenter", this.handleMouseEnter);
+        img.addEventListener("mouseleave", this.handleMouseLeave);
+        img.addEventListener("click", this.handleLeftClick);
+        img.addEventListener("contextmenu", this.handleRightClick);
+      } catch (e) {}
+    });
   };
 
   handleMouseEnter = async (e) => {
