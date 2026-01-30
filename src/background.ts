@@ -1,8 +1,8 @@
 /// <reference types="chrome"/>
+
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
     title: "Search on SauceNAO",
-    //@ts-ignore
     contexts: ["image"],
     id: "searchOnSauceNAO",
   });

@@ -77,7 +77,10 @@ export default class ViewerManager {
 
       try {
         const url = `https://api.reddit.com/by_id/${postId}`;
-        const res = await fetch(url, { signal: this.abortController.signal });
+        const res = await fetch(url, {
+          headers: { Accept: "Application/json" },
+          signal: this.abortController.signal,
+        });
         const jsn = await res.json();
         postData = jsn.data.children[0].data;
         if (!postData) {
