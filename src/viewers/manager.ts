@@ -86,6 +86,7 @@ export default class ViewerManager {
         if (!postData) {
           return;
         }
+        this.cache[postId] = postData;
       } catch (e: any) {
         if (e.name === "AbortError") {
           return;
