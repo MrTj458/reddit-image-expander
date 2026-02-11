@@ -78,7 +78,7 @@ export default class ViewerManager {
       try {
         const url = `https://api.reddit.com/by_id/${postId}`;
         const res = await fetch(url, {
-          headers: { Accept: "Application/json" },
+          headers: { Accept: "application/json" },
           signal: this.abortController.signal,
         });
         const jsn = await res.json();
@@ -112,16 +112,14 @@ export default class ViewerManager {
       this.abortController.abort();
     }
 
-    if (!this.viewer) {
-      return;
+    if (this.viewer) {
+      this.viewer.hide();
+      this.viewer = null;
     }
-
-    this.viewer.hide();
-    this.viewer = null;
   };
 
   handleLeftClick = (e: PointerEvent) => {
-    if (this.viewer && this.viewer.leftClick) {
+    if (this.viewer) {
       e.stopPropagation();
       e.preventDefault();
       this.viewer.leftClick(this.mouseX, this.mouseY);
@@ -129,7 +127,7 @@ export default class ViewerManager {
   };
 
   handleRightClick = (e: PointerEvent) => {
-    if (this.viewer && this.viewer.rightClick) {
+    if (this.viewer) {
       e.stopPropagation();
       e.preventDefault();
       this.viewer.rightClick(this.mouseX, this.mouseY);
