@@ -12,6 +12,11 @@ export type PostData = {
       m: string;
     };
   };
+  media: {
+    reddit_video: {
+      dash_url: string;
+    };
+  };
 };
 
 export interface Viewer {

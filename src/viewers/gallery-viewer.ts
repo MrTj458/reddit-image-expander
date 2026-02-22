@@ -56,9 +56,10 @@ export default class GalleryViewer implements Viewer {
         url: this.images[this.index] ?? "",
         gallery_data: { items: [] },
         media_metadata: {},
+        media: { reddit_video: { dash_url: "" } },
       },
       mouseX,
-      mouseY
+      mouseY,
     );
     this.position(mouseX, mouseY);
   };

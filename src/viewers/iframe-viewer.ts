@@ -2,7 +2,7 @@ import type { Viewer, PostData } from "./types";
 
 type EmbedURLConverter = {
   urls: string[];
-  getEmbedURL(url: string): string;
+  getEmbedURL(postData: PostData): string;
 };
 
 export default class IFrameViewer implements Viewer {
@@ -56,7 +56,7 @@ export default class IFrameViewer implements Viewer {
     frame.scrolling = "no";
     frame.allow = "autoplay";
     frame.style.zIndex = "1000000";
-    frame.src = this.urlConverter.getEmbedURL(postData.url);
+    frame.src = this.urlConverter.getEmbedURL(postData);
     frame.onload = () => this.position(mouseX, mouseY);
     document.body.appendChild(frame);
     this.frame = frame;
@@ -114,8 +114,8 @@ export default class IFrameViewer implements Viewer {
 
 export const youtubeEmbedConverter = {
   urls: ["youtu"],
-  getEmbedURL: (url: string) => {
-    const parsedURL = new URL(url);
+  getEmbedURL: (postData: PostData) => {
+    const parsedURL = new URL(postData.url);
 
     let videoID = parsedURL.searchParams.get("v");
     if (videoID === null) {
@@ -129,7 +129,7 @@ export const youtubeEmbedConverter = {
 
 export const gifEmbedConverter = {
   urls: ["dgif"],
-  getEmbedURL: (url: string) => {
-    return url.replace("watch", "ifr");
+  getEmbedURL: (postData: PostData) => {
+    return postData.url.replace("watch", "ifr");
   },
 };
