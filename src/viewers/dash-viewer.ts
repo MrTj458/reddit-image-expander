@@ -5,13 +5,15 @@ export default class DashViewer implements Viewer {
   frozen: boolean;
   width: number;
   height: number;
-  video: HTMLVideoElement;
+  video: HTMLVideoElement | null;
+  player: dashjs.MediaPlayerClass | null;
 
   constructor() {
     this.frozen = false;
     this.width = 0;
     this.height = 0;
-    this.video = document.createElement("video");
+    this.video = null;
+    this.player = null;
   }
 
   canHandle = (postData: PostData) => {
@@ -30,8 +32,7 @@ export default class DashViewer implements Viewer {
     this.width = window.innerWidth / 2;
     this.height = this.width / (16 / 9);
 
-    const video = this.video;
-
+    const video = document.createElement("video");
     video.style.position = "fixed";
     video.style.width = `${this.width}px`;
     video.style.height = `${this.height}px`;
@@ -41,12 +42,14 @@ export default class DashViewer implements Viewer {
     video.style.zIndex = "1000000";
     video.controls = true;
 
-    let player = dashjs.MediaPlayer().create();
+    const player = dashjs.MediaPlayer().create();
     player.initialize(video, postData.media.reddit_video.dash_url, true);
+
+    this.video = video;
+    this.player = player;
 
     document.body.appendChild(video);
     this.position(mouseX, mouseY);
-    this.video = video;
   };
 
   hide = () => {
@@ -54,11 +57,22 @@ export default class DashViewer implements Viewer {
       return;
     }
 
-    document.body.removeChild(this.video);
-    this.video.src = "";
+    if (this.video) {
+      document.body.removeChild(this.video);
+      this.video = null;
+    }
+
+    if (this.player) {
+      this.player.destroy();
+      this.player = null;
+    }
   };
 
   leftClick = (mouseX: number, mouseY: number) => {
+    if (!this.video) {
+      return;
+    }
+
     if (this.frozen) {
       this.frozen = false;
       this.video.style.border = "2px solid gray";
@@ -71,7 +85,7 @@ export default class DashViewer implements Viewer {
   rightClick = (mouseX: number, mouseY: number) => {};
 
   position = (mouseX: number, mouseY: number) => {
-    if (this.frozen) {
+    if (this.frozen || !this.video) {
       return;
     }
 
