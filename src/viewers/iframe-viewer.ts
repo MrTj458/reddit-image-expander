@@ -18,9 +18,18 @@ export default class IFrameViewer implements Viewer {
     this.frozen = false;
     this.width = 0;
     this.height = 0;
-    this.frame = document.createElement("iframe");
     this.urlConverters = converters;
     this.urlConverter = null;
+
+    const frame = document.createElement("iframe");
+    frame.style.position = "fixed";
+    frame.style.border = "2px solid gray";
+    frame.style.backgroundColor = "#000";
+    frame.style.borderRadius = "3px";
+    frame.scrolling = "no";
+    frame.allow = "autoplay";
+    frame.style.zIndex = "1000000";
+    this.frame = frame;
   }
 
   canHandle = (postData: PostData) => {
@@ -42,24 +51,16 @@ export default class IFrameViewer implements Viewer {
       return;
     }
 
+    // Calculate size each time in case window size changed
     this.width = window.innerWidth / 2;
     this.height = this.width / (16 / 9);
+    this.frame.style.width = `${this.width}px`;
+    this.frame.style.height = `${this.height}px`;
 
-    const frame = this.frame;
+    this.frame.src = this.urlConverter.getEmbedURL(postData);
+    this.frame.onload = () => this.position(mouseX, mouseY);
 
-    frame.style.position = "fixed";
-    frame.style.width = `${this.width}px`;
-    frame.style.height = `${this.height}px`;
-    frame.style.border = "2px solid gray";
-    frame.style.backgroundColor = "#000";
-    frame.style.borderRadius = "3px";
-    frame.scrolling = "no";
-    frame.allow = "autoplay";
-    frame.style.zIndex = "1000000";
-    frame.src = this.urlConverter.getEmbedURL(postData);
-    frame.onload = () => this.position(mouseX, mouseY);
-    document.body.appendChild(frame);
-    this.frame = frame;
+    document.body.appendChild(this.frame);
   };
 
   hide = () => {
@@ -68,7 +69,6 @@ export default class IFrameViewer implements Viewer {
     }
 
     document.body.removeChild(this.frame);
-    this.frame.src = "";
   };
 
   leftClick = (mouseX: number, mouseY: number) => {

@@ -6,7 +6,16 @@ export default class ImageViewer implements Viewer {
 
   constructor(supportedSites: string[]) {
     this.supportedSites = supportedSites;
-    this.img = document.createElement("img");
+
+    const img = document.createElement("img");
+    img.style.position = "fixed";
+    img.style.maxWidth = "50vw";
+    img.style.maxHeight = "90vh";
+    img.style.border = "2px solid gray";
+    img.style.backgroundColor = "#000";
+    img.style.borderRadius = "3px";
+    img.style.zIndex = "1000000";
+    this.img = img;
   }
 
   canHandle = (data: PostData) => {
@@ -19,37 +28,20 @@ export default class ImageViewer implements Viewer {
   };
 
   display = (postData: PostData, mouseX: number, mouseY: number) => {
-    const img = this.img;
+    this.img.src = postData.url;
+    this.img.onload = () => this.position(mouseX, mouseY);
 
-    img.style.position = "fixed";
-    img.style.maxWidth = "50vw";
-    img.style.maxHeight = "90vh";
-    img.style.border = "2px solid gray";
-    img.style.backgroundColor = "#000";
-    img.style.borderRadius = "3px";
-    img.style.zIndex = "1000000";
-
-    img.src = postData.url;
-    img.onload = () => this.position(mouseX, mouseY);
-
-    document.body.appendChild(img);
+    document.body.appendChild(this.img);
   };
 
   hide = () => {
-    if (this.img) {
-      document.body.removeChild(this.img);
-      this.img.src = "";
-    }
+    document.body.removeChild(this.img);
   };
 
   leftClick = (mouseX: number, mouseY: number) => {};
   rightClick = (mouseX: number, mouseY: number) => {};
 
   position = (mouseX: number, mouseY: number) => {
-    if (!this.img) {
-      return;
-    }
-
     let offset = 20;
     let img = this.img;
 
@@ -75,9 +67,7 @@ export default class ImageViewer implements Viewer {
   };
 
   changeImg = (url: string, mouseX: number, mouseY: number) => {
-    if (this.img) {
-      this.img.src = url;
-      this.img.onload = () => this.position(mouseX, mouseY);
-    }
+    this.img.src = url;
+    this.img.onload = () => this.position(mouseX, mouseY);
   };
 }

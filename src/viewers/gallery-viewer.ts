@@ -10,9 +10,18 @@ export default class GalleryViewer implements Viewer {
 
   constructor() {
     this.imgViewer = new ImageViewer([]);
-    this.indexBox = document.createElement("div");
     this.index = 0;
     this.images = [];
+
+    const indexBox = document.createElement("div");
+    indexBox.style.position = "fixed";
+    indexBox.style.backgroundColor = "gray";
+    indexBox.style.padding = "2px 4px";
+    indexBox.style.color = "white";
+    indexBox.style.fontSize = "12px";
+    indexBox.style.textAlign = "center";
+    indexBox.style.zIndex = "1000000";
+    this.indexBox = indexBox;
   }
 
   canHandle = (data: PostData) => {
@@ -27,8 +36,8 @@ export default class GalleryViewer implements Viewer {
     const metaData = postData.media_metadata;
     const galleryData = postData.gallery_data.items;
 
+    // Put media images in order
     const mediaImages: string[] = [];
-
     galleryData.forEach((image) => {
       const meta = metaData[image.media_id];
       if (meta) {
@@ -39,18 +48,12 @@ export default class GalleryViewer implements Viewer {
     });
     this.images = mediaImages;
 
-    const indexBox = document.createElement("div");
-    indexBox.style.position = "fixed";
-    indexBox.style.backgroundColor = "gray";
-    indexBox.style.padding = "2px 4px";
-    indexBox.style.color = "white";
-    indexBox.style.fontSize = "12px";
-    indexBox.style.textAlign = "center";
-    indexBox.style.zIndex = "1000000";
-    indexBox.innerText = `1/${mediaImages.length}`;
-    document.body.appendChild(indexBox);
-    this.indexBox = indexBox;
+    // Display index box
+    this.indexBox.innerText = `1/${mediaImages.length}`;
+    document.body.appendChild(this.indexBox);
+    this.position(mouseX, mouseY);
 
+    // Display image
     this.imgViewer.display(
       {
         url: this.images[this.index] ?? "",
@@ -61,7 +64,6 @@ export default class GalleryViewer implements Viewer {
       mouseX,
       mouseY,
     );
-    this.position(mouseX, mouseY);
   };
 
   hide = () => {

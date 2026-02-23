@@ -5,15 +5,23 @@ export default class DashViewer implements Viewer {
   frozen: boolean;
   width: number;
   height: number;
-  video: HTMLVideoElement | null;
+  video: HTMLVideoElement;
   player: dashjs.MediaPlayerClass | null;
 
   constructor() {
     this.frozen = false;
     this.width = 0;
     this.height = 0;
-    this.video = null;
     this.player = null;
+
+    const video = document.createElement("video");
+    video.style.position = "fixed";
+    video.style.border = "2px solid gray";
+    video.style.backgroundColor = "#000";
+    video.style.borderRadius = "3px";
+    video.style.zIndex = "1000000";
+    video.controls = true;
+    this.video = video;
   }
 
   canHandle = (postData: PostData) => {
@@ -29,26 +37,21 @@ export default class DashViewer implements Viewer {
       return;
     }
 
+    // Calculate size each time in case window size changed
     this.width = window.innerWidth / 2;
     this.height = this.width / (16 / 9);
+    this.video.style.width = `${this.width}px`;
+    this.video.style.height = `${this.height}px`;
 
-    const video = document.createElement("video");
-    video.style.position = "fixed";
-    video.style.width = `${this.width}px`;
-    video.style.height = `${this.height}px`;
-    video.style.border = "2px solid gray";
-    video.style.backgroundColor = "#000";
-    video.style.borderRadius = "3px";
-    video.style.zIndex = "1000000";
-    video.controls = true;
+    // Create a new video player
+    this.player = dashjs.MediaPlayer().create();
+    this.player.initialize(
+      this.video,
+      postData.media.reddit_video.dash_url,
+      true,
+    );
 
-    const player = dashjs.MediaPlayer().create();
-    player.initialize(video, postData.media.reddit_video.dash_url, true);
-
-    this.video = video;
-    this.player = player;
-
-    document.body.appendChild(video);
+    document.body.appendChild(this.video);
     this.position(mouseX, mouseY);
   };
 
@@ -57,22 +60,14 @@ export default class DashViewer implements Viewer {
       return;
     }
 
-    if (this.video) {
-      document.body.removeChild(this.video);
-      this.video = null;
-    }
-
     if (this.player) {
       this.player.destroy();
-      this.player = null;
     }
+
+    document.body.removeChild(this.video);
   };
 
   leftClick = (mouseX: number, mouseY: number) => {
-    if (!this.video) {
-      return;
-    }
-
     if (this.frozen) {
       this.frozen = false;
       this.video.style.border = "2px solid gray";
