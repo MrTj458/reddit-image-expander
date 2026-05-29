@@ -66,27 +66,28 @@ export default class ViewerManager {
     if (!post) {
       return;
     }
-    const postId = post.getAttribute("id");
-    if (!postId) {
+
+    const permalink = post.getAttribute("permalink");
+    if (!permalink) {
       return;
     }
 
-    let postData = this.cache[postId];
+    let postData = this.cache[permalink];
     if (!postData) {
       this.abortController = new AbortController();
 
       try {
-        const url = `https://api.reddit.com/by_id/${postId}`;
+        const url = `${permalink}.json`;
         const res = await fetch(url, {
           headers: { Accept: "application/json" },
           signal: this.abortController.signal,
         });
         const jsn = await res.json();
-        postData = jsn.data.children[0].data;
+        postData = jsn[0]?.data?.children[0]?.data;
         if (!postData) {
           return;
         }
-        this.cache[postId] = postData;
+        this.cache[permalink] = postData;
       } catch (e: any) {
         if (e.name === "AbortError") {
           return;

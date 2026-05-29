@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Reddit Image Expander",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "Expand images and videos on Reddit by hovering over the thumbnail.",
   "permissions": ["webRequest", "<all_urls>", "contextMenus"],
   "content_scripts": [
