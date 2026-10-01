@@ -1,4 +1,4 @@
-export type PostData = {
+export interface PostData {
   url: string;
   gallery_data: {
     items: {
@@ -17,7 +17,7 @@ export type PostData = {
       dash_url: string;
     };
   };
-};
+}
 
 export interface Viewer {
   canHandle(data: PostData): boolean;

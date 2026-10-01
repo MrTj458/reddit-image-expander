@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Reddit Image Expander",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "Expand images and videos on Reddit by hovering over the thumbnail.",
-  "permissions": ["webRequest", "<all_urls>", "contextMenus"],
+  "permissions": ["webRequest", "contextMenus"],
   "content_scripts": [
     {
       "matches": ["*://*.reddit.com/*"],
@@ -12,6 +12,7 @@
   ],
   "background": {
     "service_worker": "background.js",
-    "type": "module"
+    "type": "module",
+    "scripts": ["background.js"]
   }
 }
