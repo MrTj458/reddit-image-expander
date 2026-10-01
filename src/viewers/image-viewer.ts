@@ -36,6 +36,7 @@ export default class ImageViewer implements Viewer {
 
   hide = () => {
     document.body.removeChild(this.img);
+    this.img.src = "";
   };
 
   leftClick = (mouseX: number, mouseY: number) => {};
